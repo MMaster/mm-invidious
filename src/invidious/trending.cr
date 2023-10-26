@@ -38,5 +38,5 @@ def fetch_trending(trending_type, region, locale)
   end
 
   # Deduplicate items before returning results
-  return extracted.select(SearchVideo).uniq!(&.id), plid
+  return extracted.select(SearchVideo).uniq!(&.id).reject! { |itm| itm.length_seconds < 65 }, plid
 end
