@@ -107,7 +107,10 @@ def extract_video_info(video_id : String, proxy_region : String? = nil)
     # decrypted URLs and maybe fix throttling issues (#2194). See the
     # following issue for an explanation about decrypted URLs:
     # https://github.com/TeamNewPipe/NewPipeExtractor/issues/562
-    client_config.client_type = YoutubeAPI::ClientType::Android
+    #client_config.client_type = YoutubeAPI::ClientType::Android
+    # Workaround for at least DASH videos to work
+    # https://github.com/iv-org/invidious/issues/4584#issuecomment-2078996361
+    client_config.client_type = YoutubeAPI::ClientType::IOS
     new_player_response = try_fetch_streaming_data(video_id, client_config)
   elsif !reason.includes?("your country") # Handled separately
     # The Android embedded client could help here
@@ -267,7 +270,18 @@ def parse_video_info(video_id : String, player_response : Hash(String, JSON::Any
     .try &.dig?("videoActions", "menuRenderer", "topLevelButtons")
 
   if toplevel_buttons
-    likes_button = toplevel_buttons.try &.as_a
+    # New Format as of december 2023
+    likes_button = toplevel_buttons.dig?(0,
+      "segmentedLikeDislikeButtonViewModel",
+      "likeButtonViewModel",
+      "likeButtonViewModel",
+      "toggleButtonViewModel",
+      "toggleButtonViewModel",
+      "defaultButtonViewModel",
+      "buttonViewModel"
+    )
+
+    likes_button ||= toplevel_buttons.try &.as_a
       .find(&.dig?("toggleButtonRenderer", "defaultIcon", "iconType").=== "LIKE")
       .try &.["toggleButtonRenderer"]
 
@@ -280,9 +294,10 @@ def parse_video_info(video_id : String, player_response : Hash(String, JSON::Any
       )
 
     if likes_button
+      likes_txt = likes_button.dig?("accessibilityText")
       # Note: The like count from `toggledText` is off by one, as it would
       # represent the new like count in the event where the user clicks on "like".
-      likes_txt = (likes_button["defaultText"]? || likes_button["toggledText"]?)
+      likes_txt ||= (likes_button["defaultText"]? || likes_button["toggledText"]?)
         .try &.dig?("accessibility", "accessibilityData", "label")
       likes = likes_txt.as_s.gsub(/\D/, "").to_i64? if likes_txt
 
