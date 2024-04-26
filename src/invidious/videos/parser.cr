@@ -107,7 +107,10 @@ def extract_video_info(video_id : String, proxy_region : String? = nil)
     # decrypted URLs and maybe fix throttling issues (#2194). See the
     # following issue for an explanation about decrypted URLs:
     # https://github.com/TeamNewPipe/NewPipeExtractor/issues/562
-    client_config.client_type = YoutubeAPI::ClientType::Android
+    #client_config.client_type = YoutubeAPI::ClientType::Android
+    # Workaround for at least DASH videos to work
+    # https://github.com/iv-org/invidious/issues/4584#issuecomment-2078996361
+    client_config.client_type = YoutubeAPI::ClientType::IOS
     new_player_response = try_fetch_streaming_data(video_id, client_config)
   elsif !reason.includes?("your country") # Handled separately
     # The Android embedded client could help here
