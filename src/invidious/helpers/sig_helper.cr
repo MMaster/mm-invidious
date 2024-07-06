@@ -127,7 +127,7 @@ class Invidious::SigHelper
     end
 
     # Return the current player's version
-    def get_player : UInt32?
+    def get_player_version : UInt32?
       request = Request.new(Opcode::GET_PLAYER_STATUS, nil)
 
       send_request(request) do |bytes|
