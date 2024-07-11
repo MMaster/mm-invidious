@@ -173,6 +173,16 @@ https_only: false
 ##
 # use_innertube_for_captions: false
 
+##
+## Send Google session informations. This gives more identifiable information to Google.
+##
+## Useful when Invidious is blocked by the message "This helps protect our community." See https://github.com/iv-org/invidious/issues/4734
+##
+## Accepted values: true, false
+## Default: false
+##
+# po_token: XXX
+# visitor_data: XXX
 
 # -----------------------------
 #  Logging
