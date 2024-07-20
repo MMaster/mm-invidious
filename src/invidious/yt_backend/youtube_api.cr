@@ -493,7 +493,7 @@ module YoutubeAPI
         },
       },
       "serviceIntegrityDimensions" => {
-        "poToken" => CONFIG.po_token ? CONFIG.po_token.as(String) : nil,
+        "poToken" => CONFIG.po_token,
       },
     }
 
