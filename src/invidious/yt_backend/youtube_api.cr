@@ -464,7 +464,7 @@ module YoutubeAPI
     } of String => String | Int64
 
     if {"WEB", "TVHTML5"}.any? { |s| client_config.name.starts_with? s }
-      if sts = DECRYPT_FUNCTION.try &.get_sts
+      if sts = DECRYPT_FUNCTION.try &.get_sts(video_id)
         playback_ctx["signatureTimestamp"] = sts.to_i64
       end
     end

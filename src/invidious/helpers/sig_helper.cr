@@ -81,8 +81,8 @@ module Invidious::SigHelper
 
     # Forces the server to re-fetch the YouTube player, and extract the necessary
     # components from it (nsig function code, sig function code, signature timestamp).
-    def force_update : UpdateStatus
-      request = Request.new(Opcode::FORCE_UPDATE, nil)
+    def force_update(vid : String) : UpdateStatus
+      request = Request.new(Opcode::FORCE_UPDATE, StringPayload.new(vid))
 
       value = send_request(request) do |bytes|
         IO::ByteFormat::NetworkEndian.decode(UInt16, bytes)

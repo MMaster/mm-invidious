@@ -106,14 +106,14 @@ struct Video
 
       LOGGER.debug("Videos: Decoding '#{cfr}'")
 
-      unsig = DECRYPT_FUNCTION.try &.decrypt_signature(cfr["s"])
+      unsig = DECRYPT_FUNCTION.try &.decrypt_signature(cfr["s"], self.id)
       params[sp] = unsig if unsig
     else
       url = URI.parse(fmt["url"].as_s)
       params = url.query_params
     end
 
-    n = DECRYPT_FUNCTION.try &.decrypt_nsig(params["n"])
+    n = DECRYPT_FUNCTION.try &.decrypt_nsig(params["n"], self.id)
     params["n"] = n if n
 
     if token = CONFIG.po_token
@@ -353,7 +353,7 @@ def get_video(id, refresh = true, region = nil, force_refresh = false)
     # If record was last updated over 10 minutes ago, or video has since premiered,
     # refresh (expire param in response lasts for 6 hours)
     if (refresh &&
-       (Time.utc - video.updated > 10.minutes) ||
+       (Time.utc - video.updated > 5.seconds) ||
        (video.premiere_timestamp.try &.< Time.utc)) ||
        force_refresh ||
        video.schema_version != Video::SCHEMA_VERSION # cache control
